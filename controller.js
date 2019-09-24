@@ -13,14 +13,15 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  //httpOnly=True; Max-Age=10; secure=True Expires=<Date format>
-  res.setHeader('Set-Cookie', 'loggedIn=True');
+  req.session.isLoggedIn = true;
+  req.session.user = req.body.user;
   res.redirect('/');
 };
 
 exports.getLogout = (req, res, next) => {
-  res.clearCookie('loggedIn');
-  res.redirect('/');
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
 };
 
 exports.get404 = (req, res, next) => {

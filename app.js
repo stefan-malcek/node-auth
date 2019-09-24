@@ -2,6 +2,7 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 
 const controller = require('./controller');
 
@@ -14,20 +15,13 @@ const routes = require('./routes');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+  session({ secret: 'super secret', resave: false, saveUninitialized: false })
+);
 
 app.use((req, res, next) => {
-  let isLoggedIn = false;
-  const cookie = req.get('Cookie');
-  console.log(cookie);
-  if (cookie) {
-    isLoggedIn =
-      req
-        .get('Cookie')
-        .split(';')[0]
-        .trim()
-        .split('=')[1] === 'True';
-  }
-  res.locals.isAuthenticated = isLoggedIn;
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.user = req.session.user;
   next();
 });
 
